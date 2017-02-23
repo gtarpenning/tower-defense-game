@@ -54,49 +54,46 @@ def center(x, y, size):  # This is a function that finds the center of an object
     return center_x, center_y
 
 
-def main():
+def main():  # This is the main function that needs to be broken up but im lazy
     tower_counter = 0
     creep_counter = 0
     touching = False
     money = 200
     held = False
-    lives = 10
-    i = 0
-    insert = True
+    lives = 10  # Total person lives
+    i = 0  # Counter for spawn times
+    insert = True  # Is the player allowed to place a tower
     unabstructed = True
-    water_range = 50
-    fire_range = 100
+    water_range = 50  # Range of the water tower
+    fire_range = 100  # Fire range
     while True:
         clicked = False
-        screen.fill((255, 255, 255))
+        screen.fill((255, 255, 255))  # Draws a white screen
 
         # Creep Spawner
         print i, creep_counter, creep_dict
-        if i >= 40:
-            CREEP_LIVES = 200
+        if i >= 40:  # Spawns a creep every 40 ticks?
+            CREEP_LIVES = 200  # This sets how many lives a given creep has
             creep_dict[creep_counter] = {
                 'type': 'c_basic',
-                'x': 100,
-                'y': 100,
-                'del_x': 1,
-                'del_y': 1,
+                'x': 100,  # x coordinate
+                'y': 100,  # y coord
+                'del_x': 1,  # change in x
+                'del_y': 1,  # change in y
                 'lives': CREEP_LIVES
             }
             i = 0
             creep_counter += 1
 
+        pressed = pygame.key.get_pressed()
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if event.type == pygame.QUIT or pressed[pygame.K_BACKSPACE]:
                 return 'quit'
             # elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 # m_x, m_y = event.pos
-            elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+            elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:  # If you click the mouse
                 m_x, m_y = event.pos
                 clicked = True
-
-        pressed = pygame.key.get_pressed()
-        if pressed[pygame.K_BACKSPACE]:
-            return 'quit'
 
         # GAMEPLAY
         # Hold W or F to place water or fire towers
@@ -165,16 +162,17 @@ def main():
                         val['y'] += val['del_y']
                         screen.blit(c_basic, (val['x'], val['y']))
 
-        # Draws the Towers
-        for key, val in tower_dict.items():
+        # Draws the Towers and shoots the creeps
+        for key, val in tower_dict.items():  # For each tower
             t_x, t_y = center(val['x'], val['y'], tower_size)
-            if val['type'] == 't_fire':
-                screen.blit(t_fire, (val['x'], val['y']))
-                for k, v in creep_dict.items():
+            if val['type'] == 't_fire':  # This is only for the fire tower
+                screen.blit(t_fire, (val['x'], val['y']))  # Draw the tower
+                for k, v in creep_dict.items():  # For each creep
                     c_x, c_y = center(v['x'], v['y'], creep_size)
+                    # If the creep is within range of the tower
                     if abs(t_x - c_x) < fire_range and abs(t_y - c_y) < fire_range:  # RANGE OF TOWER HERE
-                        pygame.draw.line(screen, (255, 0, 0), (t_x, t_y), (c_x, c_y))
-                        v['lives'] -= 5
+                        pygame.draw.line(screen, (255, 0, 0), (t_x, t_y), (c_x, c_y))  # SHOOT!!!
+                        v['lives'] -= 5  # Creep gets less life
             elif val['type'] == 't_water':
                 screen.blit(t_water, (val['x'], val['y']))
                 for k, v in creep_dict.items():
@@ -183,20 +181,26 @@ def main():
                         pygame.draw.line(screen, (0, 0, 255), (t_x, t_y), (c_x, c_y))
                         v['lives'] -= 1
 
+        # If at any time a creep has no life left, it dies
         for in1, creep in creep_dict.items():
             if creep['lives'] < 0:
                 creep_dict.pop(in1)
 
-        # Draw the Spawner
+        # Draws the Spawner
         screen.blit(s_pineapple, (s_x, s_y))
+        # Draws the house
         screen.blit(house, (700, 700))
-
+        # Draws the menu tag
         screen.blit(myfont.render(('Menu'), 1, (0, 0, 0)), (350, 15))
+        # Draws the money label
         screen.blit(myfont.render(('Money: ' + str(money)), 1, (0, 0, 0)), (450, 15))
+        # Draws the lives
         screen.blit(heart, (550, 15))
         screen.blit(myfont.render(('= ' + str(lives)), 1, (0, 0, 0)), (580, 15))
 
+        # This is how the pygame thingy actually draws all this stuff
         pygame.display.flip()
+        # Clock?
         clock.tick(60)
         i += 1
 
