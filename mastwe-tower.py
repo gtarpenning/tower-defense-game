@@ -71,7 +71,7 @@ def main():  # This is the main function that needs to be broken up but im lazy
         screen.fill((255, 255, 255))  # Draws a white screen
 
         # Creep Spawner
-        print i, creep_counter, creep_dict
+        # print i, creep_counter, creep_dict
         if i >= 40:  # Spawns a creep every 40 ticks?
             CREEP_LIVES = 200  # This sets how many lives a given creep has
             creep_dict[creep_counter] = {
@@ -130,10 +130,10 @@ def main():  # This is the main function that needs to be broken up but im lazy
             pygame.draw.line(screen, (211, 211, 211), (0, row*40), (800, row*40))
 
         # Draws the Creeps
-        for key, val in creep_dict.items():
-            c_x, c_y = center(val['x'], val['y'], creep_size)
+        for key, creep in creep_dict.items():
+            c_x, c_y = center(creep['x'], creep['y'], creep_size)
             touching = False
-            if val['type'] == 'c_basic':
+            if creep['type'] == 'c_basic':
                 if c_x > 700 and c_y > 700:  # Is the Creep in the house?
                     touching = True
                     lives -= 1  # Removes a life
@@ -141,11 +141,11 @@ def main():  # This is the main function that needs to be broken up but im lazy
                     creep_counter -= 1
                     break
                 if not touching:
-                    for it, v in tower_dict.items():
+                    for it, tower in tower_dict.items():
                         unabstructed = True
-                        t_x, t_y = center(v['x'], v['y'], tower_size)
+                        t_x, t_y = center(tower['x'], tower['y'], tower_size)
                         # print 'tower: ' + str(t_x) + ' ' + str(t_y) + ' creep ' + str(c_x) + ' ' + str(c_y)
-                        if abs(t_x - c_x) < 30 and abs(t_y - c_y) < 30:
+                        if abs(t_x - c_x) < 30 and abs(t_y - c_y) < 30:  # Collision for towers
                             print 'touching a wall!'
                             unabstructed = False
                     if unabstructed:
@@ -154,13 +154,13 @@ def main():  # This is the main function that needs to be broken up but im lazy
                         r_x_tot = r_x / (r_x + r_y)
                         del_x = r_x_tot*1.41
                         del_y = 1.41-del_x
-                        val['x'] += del_x
-                        val['y'] += del_y
-                        screen.blit(c_basic, (val['x'], val['y']))
+                        creep['x'] += del_x
+                        creep['y'] += del_y
+                        screen.blit(c_basic, (creep['x'], creep['y']))
                     else:
-                        val['x'] += (val['del_x'] * -1)
-                        val['y'] += val['del_y']
-                        screen.blit(c_basic, (val['x'], val['y']))
+                        creep['x'] += (creep['del_x'] * -1)
+                        creep['y'] += creep['del_y']
+                        screen.blit(c_basic, (creep['x'], creep['y']))
 
         # Draws the Towers and shoots the creeps
         for key, val in tower_dict.items():  # For each tower
